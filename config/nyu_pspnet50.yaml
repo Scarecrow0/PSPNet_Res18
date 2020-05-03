@@ -1,0 +1,38 @@
+DATA:
+  classes: 41
+
+TRAIN:
+  layers: 50
+  save_freq: 5
+  save_path: exp/nyu/pspnet50/model
+  sync_bn: False  # adopt syncbn or not
+  train_h: 401
+  train_w: 401
+  scale_min: 0.5  # minimum random scale
+  scale_max: 2.0  # maximum random scale
+  rotate_min: -10  # minimum random rotate
+  rotate_max: 10  # maximum random rotate
+  zoom_factor: 8 # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+  ignore_label: 0
+  aux_weight: 0.4
+  compact: 0 # 0-no, 1-yes
+  shrink_factor: 2 # shrink factor when get attention mask
+  mask_h: # specify mask h or not
+  mask_w: # specify mask w or not
+  normalization_factor: 1.0 # normalization factor for aggregation
+  train_gpu: [0, 1, 2, 3, 4, 5, 6, 7]
+  workers: 8  # data loader workers
+  batch_size: 16  # batch size for training
+  batch_size_val: 8  # batch size for validation during training, memory and speed tradeoff
+  base_lr: 0.01
+  epochs: 50
+  start_epoch: 0
+  power: 0.9
+  momentum: 0.9
+  weight_decay: 0.0001
+  print_freq: 10
+  weight:  # path to initial weight (default: none)
+  resume:  # path to latest checkpoint (default: none)
+  evaluate: True  # evaluate on validation set, extra gpu memory needed and small batch_size_val is recommend
+
+

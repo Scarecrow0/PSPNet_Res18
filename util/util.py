@@ -1,14 +1,15 @@
 import os
-import numpy as np
-from PIL import Image
 
+import numpy as np
 import torch
-from torch import nn
 import torch.nn.init as initer
+from PIL import Image
+from torch import nn
 
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 
@@ -45,14 +46,24 @@ def intersectionAndUnion(output, target, K, ignore_index=255):
     target = target.reshape(target.size)
     output[np.where(target == ignore_index)[0]] = ignore_index
     intersection = output[np.where(output == target)[0]]
-    area_intersection, _ = np.histogram(intersection, bins=np.arange(K+1))
-    area_output, _ = np.histogram(output, bins=np.arange(K+1))
-    area_target, _ = np.histogram(target, bins=np.arange(K+1))
+    area_intersection, _ = np.histogram(intersection, bins=np.arange(K + 1))
+    area_output, _ = np.histogram(output, bins=np.arange(K + 1))
+    area_target, _ = np.histogram(target, bins=np.arange(K + 1))
     area_union = area_output + area_target - area_intersection
     return area_intersection, area_union, area_target
 
 
-def intersectionAndUnionGPU(output, target, K, ignore_index=255):
+def intersectionAndUnionGPU(output, target, K, ignore_index=255, to_cpu=False, to_numpy=False):
+    """
+
+    :param output: label prediction: batch_size x H x W
+    :param target: label target:  batch_size x H x W
+    :param K: classes number
+    :param ignore_index: background index
+    :return:
+        the pixel number of target mask,
+        intersection, union target and prediction
+    """
     # 'K' classes, output and target sizes are N or N * L or N * H * W, each value in range 0 to K - 1.
     assert (output.dim() in [1, 2, 3])
     assert output.shape == target.shape
@@ -61,11 +72,23 @@ def intersectionAndUnionGPU(output, target, K, ignore_index=255):
     output[target == ignore_index] = ignore_index
     intersection = output[output == target]
     # https://github.com/pytorch/pytorch/issues/1382
-    area_intersection = torch.histc(intersection.float().cpu(), bins=K, min=0, max=K-1)
-    area_output = torch.histc(output.float().cpu(), bins=K, min=0, max=K-1)
-    area_target = torch.histc(target.float().cpu(), bins=K, min=0, max=K-1)
+    area_intersection = torch.histc(intersection.float().cpu(), bins=K, min=0, max=K - 1)
+    area_output = torch.histc(output.float().cpu(), bins=K, min=0, max=K - 1)
+    area_target = torch.histc(target.float().cpu(), bins=K, min=0, max=K - 1)
     area_union = area_output + area_target - area_intersection
-    return area_intersection.cuda(), area_union.cuda(), area_target.cuda()
+    if to_cpu:
+        area_intersection = area_intersection.cpu()
+        area_union = area_union.cpu()
+        area_target = area_target.cpu()
+        if to_numpy:
+            area_intersection = area_intersection.numpy()
+            area_union = area_union.numpy()
+            area_target = area_target.numpy()
+        return area_intersection, area_union, area_target
+    else:
+        return area_intersection.cuda(), \
+               area_union.cuda(), \
+               area_target.cuda()
 
 
 def check_mkdir(dir_name):

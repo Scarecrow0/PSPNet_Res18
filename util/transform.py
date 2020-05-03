@@ -1,10 +1,10 @@
-import random
-import math
-import numpy as np
-import numbers
 import collections
-import cv2
+import math
+import numbers
+import random
 
+import cv2
+import numpy as np
 import torch
 
 
@@ -111,6 +111,7 @@ class Crop(object):
         size (sequence or int): Desired output size of the crop. If size is an
         int instead of sequence like (h, w), a square crop (size, size) is made.
     """
+
     def __init__(self, size, crop_type='center', padding=None, ignore_label=255):
         if isinstance(size, int):
             self.crop_h = size
@@ -151,8 +152,10 @@ class Crop(object):
         if pad_h > 0 or pad_w > 0:
             if self.padding is None:
                 raise (RuntimeError("segtransform.Crop() need padding while padding argument is None\n"))
-            image = cv2.copyMakeBorder(image, pad_h_half, pad_h - pad_h_half, pad_w_half, pad_w - pad_w_half, cv2.BORDER_CONSTANT, value=self.padding)
-            label = cv2.copyMakeBorder(label, pad_h_half, pad_h - pad_h_half, pad_w_half, pad_w - pad_w_half, cv2.BORDER_CONSTANT, value=self.ignore_label)
+            image = cv2.copyMakeBorder(image, pad_h_half, pad_h - pad_h_half, pad_w_half, pad_w - pad_w_half,
+                                       cv2.BORDER_CONSTANT, value=self.padding)
+            label = cv2.copyMakeBorder(label, pad_h_half, pad_h - pad_h_half, pad_w_half, pad_w - pad_w_half,
+                                       cv2.BORDER_CONSTANT, value=self.ignore_label)
         h, w = label.shape
         if self.crop_type == 'rand':
             h_off = random.randint(0, h - self.crop_h)
@@ -160,8 +163,8 @@ class Crop(object):
         else:
             h_off = int((h - self.crop_h) / 2)
             w_off = int((w - self.crop_w) / 2)
-        image = image[h_off:h_off+self.crop_h, w_off:w_off+self.crop_w]
-        label = label[h_off:h_off+self.crop_h, w_off:w_off+self.crop_w]
+        image = image[h_off:h_off + self.crop_h, w_off:w_off + self.crop_w]
+        label = label[h_off:h_off + self.crop_h, w_off:w_off + self.crop_w]
         return image, label
 
 
@@ -188,8 +191,10 @@ class RandRotate(object):
             angle = self.rotate[0] + (self.rotate[1] - self.rotate[0]) * random.random()
             h, w = label.shape
             matrix = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1)
-            image = cv2.warpAffine(image, matrix, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=self.padding)
-            label = cv2.warpAffine(label, matrix, (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=self.ignore_label)
+            image = cv2.warpAffine(image, matrix, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT,
+                                   borderValue=self.padding)
+            label = cv2.warpAffine(label, matrix, (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT,
+                                   borderValue=self.ignore_label)
         return image, label
 
 

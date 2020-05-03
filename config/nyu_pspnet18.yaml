@@ -1,0 +1,35 @@
+DATA:
+  classes: 41
+
+TRAIN:
+  epochs: 100
+  layers: 18
+  pretrained: True
+  save_freq: 5
+  save_path: exp/nyu/pspnet18_trainval_naive_ppm_more_epochs/model
+  naive_ppm: True  # no pooling, just 1x1 conv on initial feature map
+  train_h: 561
+  train_w: 561
+  scale_min: 0.5  # minimum random scale
+  scale_max: 2.0  # maximum random scale
+  rotate_min: -10  # minimum random rotate
+  rotate_max: 10  # maximum random rotate
+  zoom_factor: 4
+  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+  # it is depends on the downsample rate of Conv backbone
+  ignore_label: 255
+  aux_weight: 0.4
+  workers: 16  # data loader workers
+  batch_size: 16  # batch size for training
+  batch_size_val: 16  # batch size for validation during training, memory and speed tradeoff
+  base_lr: 0.01
+  start_epoch: 0
+  momentum: 0.9
+  weight_decay: 0.0001
+  power: 0.9  # learning rate schedule
+  print_freq: 10
+  weight:  # path to initial weight (default: none)
+  resume:  # path to latest checkpoint (default: none)
+  evaluate: True  # evaluate on validation set, extra gpu memory needed and small batch_size_val is recommend
+
+
